@@ -5,22 +5,22 @@ import urllib
 bot = pzgram.Bot("883446648:AAHGWLcnWooHtKjxk43isvh_2Y3k8kGAz6o")
 
 
-def main():
+def main(chat):
     button1 = pzgram.create_button("Temperatura", data="temperatura")
     button2 = pzgram.create_button("Pressione", data="pressione")
 
     k = [[button1, button2]]
     keyboard = pzgram.create_inline(k)
 
-    pzgram.Chat(bot, 693507806).send("Seleziona un dato da controllare: ", reply_markup=keyboard)
+    chat.send("Seleziona un dato da controllare: ", reply_markup=keyboard)
 
 
-def temperatura2():
-    pzgram.Chat(bot, 693507806).send("temperatura")
+def temperatura2(chat, INPUT):
+    chat.send(INPUT)
 
 
-def pressione2():
-    pzgram.Chat(bot, 693507806).send("pressione")
+def pressione2(chat, INPUT):
+    chat.send(INPUT)
 
 
 bot.set_query({"temperatura": temperatura2, "pressione": pressione2})
