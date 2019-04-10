@@ -10,15 +10,29 @@ def on_subscribe(client, userdata, mid, granted_qos):
 	print('Avviato con QoS: {}'.format(granted_qos[0]))
 
 def on_message(client, userdata, msg):
-    global temperatura, altitudine, pressione, luce
+    global temperatura, altitudine, pressione, luce, firstRun, i
+    if firstRun==True:
+        i=0
+        temperatura =[]
+        altitudine=[]
+        pressione=[]
+        luce=[]
+        firstRun=False
     if msg.topic == "/calvino-04/temperatura":
-        temperatura=msg.payload.decode()
+        temperatura.append(float(msg.payload.decode()))
+        i += 1
     elif msg.topic == "/calvino-04/altitudine":
-        altitudine=msg.payload.decode()
+        altitudine.append(float(msg.payload.decode()))
+        i += 1
     elif msg.topic == "/calvino-04/pressione":
-        pressione=msg.payload.decode()
+        pressione.append(float(msg.payload.decode()))
+        i += 1
     elif msg.topic == "/calvino-04/luce":
-        luce = msg.payload.decode()
+        luce.append(float(msg.payload.decode()))
+        i += 1
+    if i == 250:
+        print('reset variabili avvenuto')
+        firstRun=True
 
 def mqttStart():
 	client = mqtt.Client(protocol = mqtt.MQTTv311)
@@ -50,16 +64,16 @@ def SetBot(chat):
 
 
 def sendTemperatura(chat):
-    chat.send(temperatura+" °C")
+    chat.send(str(round(sum(temperatura)/len(temperatura),2))+" °C")
 
 def sendPressione(chat):
-    chat.send(pressione+" Pa")
+    chat.send(str(round(sum(pressione)/len(pressione),2))+" Pa")
 
 def sendLuce(chat):
-    chat.send(luce+" Lux")
+    chat.send(str(round(sum(luce)/len(luce),2))+" Lux")
 
 def sendAltitudine(chat):
-    chat.send(altitudine+ " Metri")
+    chat.send(str(round(sum(altitudine)/len(altitudine),2))+ " Metri")
 
 def LaunchBot():
     bot.set_query({"temperatura": sendTemperatura, "pressione": sendPressione,"luce": sendLuce, "altitudine": sendAltitudine})
@@ -68,6 +82,7 @@ def LaunchBot():
 
 if __name__ == '__main__':
     bot = pzgram.Bot("883446648:AAHGWLcnWooHtKjxk43isvh_2Y3k8kGAz6o")
+    firstRun=True
     mqttThread = threading.Thread(target=mqttStart)
     mqttThread.setDaemon(True)
     mqttThread.start()
