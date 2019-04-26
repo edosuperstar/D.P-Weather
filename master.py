@@ -18,16 +18,16 @@ def on_message(client, userdata, msg):
         pressione=[]
         luce=[]
         firstRun=False
-    if msg.topic == "/calvino-04/temperatura":
+    if msg.topic == "/calvino-05/temperatura":
         temperatura.append(float(msg.payload.decode()))
         i += 1
-    elif msg.topic == "/calvino-04/altitudine":
+    elif msg.topic == "/calvino-05/altitudine":
         altitudine.append(float(msg.payload.decode()))
         i += 1
-    elif msg.topic == "/calvino-04/pressione":
+    elif msg.topic == "/calvino-05/pressione":
         pressione.append(float(msg.payload.decode()))
         i += 1
-    elif msg.topic == "/calvino-04/luce":
+    elif msg.topic == "/calvino-05/luce":
         luce.append(float(msg.payload.decode()))
         i += 1
     if i == 250:
