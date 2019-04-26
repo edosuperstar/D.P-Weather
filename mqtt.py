@@ -3,25 +3,38 @@ import paho.mqtt.client as mqtt
 global temperatura,altitudine,pressione,luce
 
 def on_connect(client, userdata, flags, rc):
-	print('result from connect: {}'.format(mqtt.connack_string(rc)))
+	print('Connessione al server Calvino...: {}'.format(mqtt.connack_string(rc)))
 	client.subscribe('/#', qos = 0)
 
 def on_subscribe(client, userdata, mid, granted_qos):
-	print('subscribed topic with QoS: {}'.format(granted_qos[0]))
+	print('Avviato con QoS: {}'.format(granted_qos[0]))
 
 def on_message(client, userdata, msg):
-	if msg.topic == "/calvino-04/temperatura":
-		temperatura=msg.payload.decode()
-	elif msg.topic == "/calvino-04/altitudine":
-		altitudine=msg.payload.decode()
-	elif msg.topic == "/calvino-04/pressione":
-		pressione=msg.payload.decode()
-	elif msg.topic == "/calvino-04/luce":
-		luce = msg.payload.decode()
-	#print('msg: {} from topic: {}'.format(msg.payload.decode(), msg.topic))
+    global temperatura, altitudine, pressione, luce, firstRun, i
+    if firstRun==True:
+        i=0
+        temperatura =[]
+        altitudine=[]
+        pressione=[]
+        luce=[]
+        firstRun=False
+    if msg.topic == "/calvino-05/temperatura":
+        temperatura.append(float(msg.payload.decode()))
+        i += 1
+    elif msg.topic == "/calvino-05/altitudine":
+        altitudine.append(float(msg.payload.decode()))
+        i += 1
+    elif msg.topic == "/calvino-05/pressione":
+        pressione.append(float(msg.payload.decode()))
+        i += 1
+    elif msg.topic == "/calvino-05/luce":
+        luce.append(float(msg.payload.decode()))
+        i += 1
+    if i == 250:
+        print('reset variabili avvenuto')
+        firstRun=True
 
-
-def main():
+def mqttStart():
 	client = mqtt.Client(protocol = mqtt.MQTTv311)
 	client.on_connect = on_connect
 	client.on_subscribe = on_subscribe
@@ -35,5 +48,6 @@ def main():
 	except KeyboardInterrupt:
 		print()
 
+
 if __name__ == '__main__':
-	main()
+	mqttStart()
